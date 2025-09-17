@@ -383,60 +383,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // --- Enhanced Touch Gestures for Mobile ---
-  let touchStartY = 0;
-  let touchEndY = 0;
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  document.addEventListener('touchstart', e => {
-    touchStartY = e.changedTouches[0].screenY;
-    touchStartX = e.changedTouches[0].screenX;
-  });
-
-  document.addEventListener('touchend', e => {
-    touchEndY = e.changedTouches[0].screenY;
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-  });
-
-  function handleSwipe() {
-    const swipeThreshold = 50;
-    const diffY = touchStartY - touchEndY;
-    const diffX = touchStartX - touchEndX;
-    
-    if (Math.abs(diffY) > swipeThreshold) {
-      if (diffY > 0) {
-        // Swipe up - scroll to next section
-        const currentSection = document.elementFromPoint(window.innerWidth/2, window.innerHeight/2);
-        if (currentSection) {
-          const nextSection = currentSection.closest('section')?.nextElementSibling;
-          if (nextSection) {
-            nextSection.scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-      } else {
-        // Swipe down - scroll to previous section
-        const currentSection = document.elementFromPoint(window.innerWidth/2, window.innerHeight/2);
-        if (currentSection) {
-          const prevSection = currentSection.closest('section')?.previousElementSibling;
-          if (prevSection) {
-            prevSection.scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-      }
-    }
-    
-    if (Math.abs(diffX) > swipeThreshold) {
-      if (diffX > 0) {
-        // Swipe left - could trigger menu or navigation
-        console.log('Swipe left detected');
-      } else {
-        // Swipe right - could trigger menu or navigation
-        console.log('Swipe right detected');
-      }
-    }
-  }
+  // --- Touch Gestures Disabled to Prevent Auto-Scrolling ---
+  // Removed automatic swipe scrolling that was causing issues
 
   // --- Dynamic Counter Animation ---
   function animateCounter(element, target, duration = 2000) {

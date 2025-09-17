@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Sriram Stationary</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- ✅ Flask static path -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <header class="dashboard-header">
+      <div class="header-content">
+        <img src="{{ url_for('static', filename='assets/logo-img.jpeg') }}" alt="Logo" class="header-logo">
+        <div class="header-text">
+          <h1>Sriram Stationary Dashboard</h1>
+          <p id="current-date">Welcome, Admin!</p>
+        </div>
+        <div class="header-actions">
+          <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+            <i class="fa-solid fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-main">
+      <section class="summary-cards">
+        <div class="summary-card">
+          <i class="fa-solid fa-box-archive"></i>
+          <div class="card-content">
+            <span id="total-orders">0</span>
+            <p>Total Orders</p>
+          </div>
+        </div>
+        <div class="summary-card">
+          <i class="fa-solid fa-hourglass-half"></i>
+          <div class="card-content">
+            <span id="pending-orders">0</span>
+            <p>Pending</p>
+          </div>
+        </div>
+        <div class="summary-card">
+          <i class="fa-solid fa-circle-check"></i>
+          <div class="card-content">
+            <span id="completed-orders">0</span>
+            <p>Completed</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="orders-section">
+  <div class="toolbar">
+    <h2>Customer Orders</h2>
+    <div class="search-wrapper">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="search-bar" placeholder="Search by name or phone...">
+    </div>
+  </div>
+
+  <div id="orders-container"></div>
+</section>
+  <!-- ✅ Flask static path -->
+  <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>

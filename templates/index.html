@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sriram Books And Stationary</title>
+  <meta name="description" content="Your one-stop shop for Books & Stationary in Warangal.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <!-- ✅ Fixed Flask static path -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="#home">
+        <img src="{{ url_for('static', filename='assets/logo-img.jpeg') }}" alt="Sriram Book and Stationary Logo" class="logo-img">
+        <span class="logo-text">Sriram Books And Stationary</span>
+      </a>
+
+      <nav class="main-nav">
+        <a href="#categories" data-text="Categories">Categories</a>
+        <a href="#featured" data-text="Featured">Featured</a>
+        <a href="#offers" data-text="Offers">Offers</a>
+        <a href="#upload" data-text="Send Files">Send Files</a>
+        <a href="#contact" data-text="Contact Us">Contact Us</a>
+      </nav>
+
+      <div class="header-actions">
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+          <i class="fa-solid fa-sun"></i>
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button class="menu-toggle" aria-label="Open menu">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <h1 class="reveal">Your One-Stop Shop for Books & Stationary</h1>
+          <p class="reveal">Find textbooks, notebooks, pens, art supplies and more – all in one place.</p>
+          <div class="reveal">
+            <a href="#upload" class="btn btn-accent">Get Printout's</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="categories" class="categories">
+      <div class="container">
+        <h2 class="section-title reveal">Shop by Category</h2>
+        <div class="categories-grid">
+
+          <div class="category-card reveal">
+            <div class="category-card-inner">
+              <div class="category-card-front">
+                <i class="fa-solid fa-book"></i>
+                <span>Books</span>
+              </div>
+              <div class="category-card-back">
+                <i class="fa-solid fa-book"></i>
+                <span>All Books</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="category-card reveal">
+            <div class="category-card-inner">
+              <div class="category-card-front">
+                <i class="fa-solid fa-pen-nib"></i>
+                <span>Pens</span>
+              </div>
+              <div class="category-card-back">
+                <i class="fa-solid fa-pen-nib"></i>
+                <span>All Pens</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="category-card reveal">
+            <div class="category-card-inner">
+              <div class="category-card-front">
+                <i class="fa-solid fa-book-open"></i>
+                <span>Notebooks</span>
+              </div>
+              <div class="category-card-back">
+                <i class="fa-solid fa-book-open"></i>
+                <span>All Notebooks</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="category-card reveal">
+            <div class="category-card-inner">
+              <div class="category-card-front">
+                <i class="fa-solid fa-palette"></i>
+                <span>Art Supplies</span>
+              </div>
+              <div class="category-card-back">
+                <i class="fa-solid fa-palette"></i>
+                <span>All Art</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="category-card reveal">
+            <div class="category-card-inner">
+              <div class="category-card-front">
+                <i class="fa-solid fa-ruler-combined"></i>
+                <span>Stationary</span>
+              </div>
+              <div class="category-card-back">
+                <i class="fa-solid fa-ruler-combined"></i>
+                <span>All Stationary</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="featured" class="featured">
+      <div class="container">
+        <h2 class="section-title reveal">Featured Products</h2>
+        <div id="featured-cards-container" class="cards-grid">
+        </div>
+      </div>
+    </section>
+
+    <section id="offers" class="promos">
+      <div class="container">
+        <h2 class="section-title reveal">Current Offers</h2>
+        <div class="promos-grid">
+          <article class="promo-card promo-orange reveal">
+            <h3>Up to 30% Off</h3>
+            <p>On complete school supply kits. Get everything you need for the new year!</p>
+          </article>
+          <article class="promo-card promo-yellow reveal">
+            <h3>Buy 2 Get 1 Free</h3>
+            <p>On a wide selection of premium and everyday writing pens.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="upload" class="upload-section">
+      <div class="container reveal">
+        <h2 class="section-title">Upload Your Files and Documents</h2>
+        <p class="section-subtitle">Have a list of Files? Fill in your details and upload Here!</p>
+
+        <div class="form-inputs">
+          <input type="text" id="customer-name" placeholder="Your Name" required>
+          <input type="tel" id="customer-phone" maxlength="10" pattern="\d{10}"
+            required placeholder="Enter Phone Number" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+        </div>
+
+        <div id="drop-area">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <p>Drag & Drop files here or click to select</p>
+          <input type="file" id="fileElem" multiple accept="image/*,application/pdf" style="display:none">
+          <label class="btn" for="fileElem">Select Files</label>
+        </div>
+        <div id="file-preview-container"></div>
+        <button id="send-upload-btn" class="btn btn-accent" disabled>Send </button>
+        <br><br>
+        <div>
+          <h2> OR </h2>
+        </div>
+        <div class="whatsapp-block reveal">
+          <i class="fa-brands fa-whatsapp"></i>
+          <div class="whatsapp-text">
+            <span>Prefer to Send Via WhatsApp?</span>
+            <a href="https://wa.me/918074797719" target="_blank">Send Your Files and Documents Here</a>
+          </div>
+        </div>
+
+        <section id="contact" class="contact">
+          <div class="container reveal">
+            <h2 class="section-title">Get In Touch</h2>
+            <p>
+              <i class="fa-solid fa-location-dot"></i>
+              <a href="https://shorturl.at/LiJd2" target="_blank" rel="noopener noreferrer">
+                19-9-479, Shambunipet, Warangal, Telangana 506005
+              </a>
+            </p>
+            <p>
+              <i class="fa-solid fa-phone"></i>
+              <a href="tel:+918074797719">+91 8074797719</a>
+            </p>
+            <p>
+              <i class="fa-solid fa-clock"></i>
+              Mon - Sat: 9:00 AM - 9:00 PM | Sunday: Closed
+            </p>
+          </div>
+        </section>
+    </section>
+  </main>
+
+  <footer class="site-footer-bottom">
+    <div class="container">
+      <p>© 2025 Sriram Books And Stationary. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ✅ Fixed Flask static path -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

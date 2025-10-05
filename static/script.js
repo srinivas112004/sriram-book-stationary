@@ -273,10 +273,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Validate file sizes
+      const maxSize = 50 * 1024 * 1024; // 50MB
+      for (let file of selectedFiles) {
+        if (file.size > maxSize) {
+          alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
+          return;
+        }
+      }
+
       const formData = new FormData();
       formData.append('name', name);
       formData.append('phone', phone);
+      
+      // Add files to form data
       selectedFiles.forEach(file => {
+        console.log('Adding file:', file.name, 'Size:', file.size, 'Type:', file.type);
         formData.append('files[]', file);
       });
 
@@ -284,8 +296,31 @@ document.addEventListener('DOMContentLoaded', () => {
       sendBtn.disabled = true;
 
       try {
-        const response = await fetch('/upload', { method: 'POST', body: formData });
+        console.log('Sending upload request...');
+        
+        // Add timeout to fetch request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+        
+        const response = await fetch('/upload', { 
+          method: 'POST', 
+          body: formData,
+          signal: controller.signal,
+          credentials: 'same-origin'
+        });
+        
+        clearTimeout(timeoutId);
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Server error response:', errorText);
+          throw new Error(`Server returned ${response.status}: ${errorText}`);
+        }
+        
         const result = await response.json();
+        console.log('Upload result:', result);
 
         if (result.success) {
           // ✅ Show success banner below button
@@ -322,7 +357,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
       } catch (error) {
         console.error('Error uploading files:', error);
-        alert(`Upload failed: ${error.message}`);
+        
+        let errorMessage = 'Upload failed: ';
+        if (error.name === 'AbortError') {
+          errorMessage += 'Request timed out. Please try with smaller files or check your internet connection.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage += 'Network error. Please check your internet connection and try again.';
+        } else {
+          errorMessage += error.message;
+        }
+        
+        alert(errorMessage);
+        
+        // Show error banner
+        let errorBanner = document.getElementById("error-banner");
+        if (!errorBanner) {
+          errorBanner = document.createElement("div");
+          errorBanner.id = "error-banner";
+          errorBanner.style.marginTop = "1rem";
+          errorBanner.style.padding = "0.75rem 1rem";
+          errorBanner.style.backgroundColor = "#fee2e2";
+          errorBanner.style.color = "#991b1b";
+          errorBanner.style.borderRadius = "8px";
+          errorBanner.style.fontWeight = "600";
+          errorBanner.style.textAlign = "center";
+          sendBtn.insertAdjacentElement("afterend", errorBanner);
+        }
+        errorBanner.textContent = "❌ " + errorMessage;
+        errorBanner.style.display = "block";
+        
+        // Auto-hide after 10s
+        setTimeout(() => {
+          errorBanner.style.display = "none";
+        }, 10000);
+        
       } finally {
         sendBtn.textContent = 'Send';
         checkFormValidity();

@@ -8,9 +8,10 @@ from datetime import datetime
 from functools import wraps
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = False
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
 
 app.secret_key = "mysupersecret123"  # ✅ Hardcoded secret key for sessions
 
@@ -21,6 +22,7 @@ ADMIN_PASSWORD = "sriram123"  # Change this to a strong password
 UPLOAD_FOLDER = 'uploads'
 DB_PATH = 'db.json'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'txt'}
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -37,6 +39,10 @@ def login_required(f):
 # Hash password function
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
+
+# Check if file extension is allowed
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def home():
@@ -70,23 +76,53 @@ def admin_page():
     return render_template('admin.html')
 
 
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['POST', 'OPTIONS'])
 def upload_file():
+    # Handle preflight request
+    if request.method == 'OPTIONS':
+        response = jsonify({'success': True})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        return response, 200
+    
     try:
+        # Validate request data
         name = request.form.get("name")
         phone = request.form.get("phone")
-        files = request.files.getlist("files[]")  # ✅ accept multiple files
+        files = request.files.getlist("files[]")
 
-        if not name or not phone or not files:
-            return jsonify({'success': False, 'message': 'Missing fields'}), 400
+        print(f"[UPLOAD] Received upload request - Name: {name}, Phone: {phone}, Files count: {len(files)}")
 
+        if not name or not phone:
+            return jsonify({'success': False, 'message': 'Name and phone number are required'}), 400
+
+        if not files or len(files) == 0:
+            return jsonify({'success': False, 'message': 'No files selected'}), 400
+
+        # Validate and save files
         saved_files = []
         for file in files:
             if file and file.filename != '':
+                # Check if file type is allowed
+                if not allowed_file(file.filename):
+                    allowed_types = ', '.join(ALLOWED_EXTENSIONS)
+                    return jsonify({
+                        'success': False, 
+                        'message': f'File type not allowed: {file.filename}. Allowed types: {allowed_types}'
+                    }), 400
+                
+                # Generate unique filename
                 filename = datetime.now().strftime("%Y%m%d%H%M%S-") + secure_filename(file.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                
+                # Save file
                 file.save(filepath)
                 saved_files.append(filename)
+                print(f"[UPLOAD] Saved file: {filepath}")
+
+        if len(saved_files) == 0:
+            return jsonify({'success': False, 'message': 'No valid files were uploaded'}), 400
 
         # Read existing data
         data = []
@@ -95,25 +131,33 @@ def upload_file():
                 try:
                     data = json.load(db_file)
                 except json.JSONDecodeError:
-                    pass
+                    data = []
 
         # Append new order with default status
-        data.append({
+        new_order = {
             'name': name,
             'phone': phone,
             'files': saved_files,
             'status': 'pending',
             'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        })
+        }
+        data.append(new_order)
 
         # Write back to db.json
         with open(DB_PATH, 'w') as db_file:
             json.dump(data, db_file, indent=4)
 
-        return jsonify({'success': True, 'files': saved_files}), 200
+        print(f"[UPLOAD] Successfully saved {len(saved_files)} files for {name}")
+        
+        response = jsonify({'success': True, 'files': saved_files, 'message': 'Files uploaded successfully'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
 
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        print(f"[UPLOAD] Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Server error: {str(e)}'}), 500
 
 
 @app.route('/orders', methods=['GET'])
